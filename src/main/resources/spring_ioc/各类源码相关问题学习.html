@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<body>
+<h1>Spring 中的 aop </h1>
+<h2></h2>
+<p>
+    1, Spring 中的 aop 注入到容器中的 对象是动态代理对象，代理的类型分为jdkProxy   和 CglibAopProxy
+    其中被代理的对象是一个实体类且没有实现接口的时候，使用的是 CglibAopProxy 代理，当被代理的对象是实现一个接口的时候，使用的是jdkProxy
+</p>
+<img src="../img/动态代理生成类.jpg" alt="" style="height: 400px;width: 1200px">
+</body>
+</html>
