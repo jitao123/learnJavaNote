@@ -43,7 +43,66 @@
     暂时没有人执行的任务全部都会存放在队列里面，假如现在有1000W任务，但是初始线程数量只有10个，
     那么剩余的900多W的线程都会放入LinkedBlockingQueue队列，那么服务器的内存就会受不了。
     ExecutorService cachedThreadPool = Executors.newCachedThreadPool();
-    创建方式也不被推荐的方式就是，如果现在有1000W个任务要执行，那么就会创建1000W个线程，那么cpu就会100%，严重还会崩溃
+    创建方式也不被推荐的方式就是，如果现在有1000W个任务要执行，那么就会创建1000W个线程，那么cpu就会100%，严重还会崩溃 ，内存泄露 oom异常
     </p>
+<hr>
+<p>自定义线程池的代码实现及分析
+    // 自定义线程池 ，初始核心员工容量为10，非核心员工10（共计maximumPoolSize=20），自定义队列ArrayBlockingQueue长度为10
+   // ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(10, 20, 0L,
+    TimeUnit.SECONDS, new ArrayBlockingQueue<Runnable>(10)),
+        如图所示，线程执行的优先级 是 核心员工，队列，非核心员工
+</p>
+<img src="../img/自定义线程池.jpg" alt="" style="height: 400px;width: 800px">
+<p>      // 当前的队列存在的问题是，任务数量一旦超过了定义的30个任务就会向上抛出异常 </p>
+<img src="../img/经常使用出现异常.jpg" alt="" style="height: 400px;width: 800px">
+<p>线程池的提交优先级 ，1，核心员工，2队列 3，非核心员工。
+    线程池的执行优先级，1，核心员工，2，非核心员工，3，队列 ，队列中的任务是最后执行的</p>
+<p>线程池的高效工作的秘密 1， 线程复用，2，线程中直接调用的run 方法，而不是start方法</p>
+<img src="../img/线程池高效率的秘诀.jpg" alt="" style="height: 400px;width: 800px">
+
+<!--保存文本格式的标签-->
+<hr>
+<pre>
+     try {
+    // task 线程不为空 ||
+    while (task != null || (task = getTask()) != null) {
+    w.lock();
+    // If pool is stopping, ensure thread is interrupted;
+    // if not, ensure thread is not interrupted.  This
+    // requires a recheck in second case to deal with
+    // shutdownNow race while clearing interrupt
+    if ((runStateAtLeast(ctl.get(), STOP) ||
+    (Thread.interrupted() &&
+    runStateAtLeast(ctl.get(), STOP))) &&
+    !wt.isInterrupted())
+    wt.interrupt();
+    try {
+    beforeExecute(wt, task);
+    Throwable thrown = null;
+    try {
+    // 调用的是 run方法 ，是方法调用
+    task.run();
+    } catch (RuntimeException x) {
+    thrown = x; throw x;
+    } catch (Error x) {
+    thrown = x; throw x;
+    } catch (Throwable x) {
+    thrown = x; throw new Error(x);
+    } finally {
+    afterExecute(task, thrown);
+    }
+    } finally {
+    task = null;
+    w.completedTasks++;
+    w.unlock();
+    }
+    }
+    completedAbruptly = false;
+    } finally {
+    // 验证是否线程结束，时间结束，重掉addworker方法
+    processWorkerExit(w, completedAbruptly);
+    }
+</pre>
+
 </body>
 </html>

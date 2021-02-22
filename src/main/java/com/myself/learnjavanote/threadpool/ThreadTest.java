@@ -7,9 +7,9 @@ import java.util.List;
  * @author: AT
  * @Date: 2021/2/20 3:41 下午
  */
-public class ThreadTest extends Thread {
+public class ThreadTest implements Runnable {
 
-    public int number;
+    public int number=0;
 
     public ThreadTest(int number) {
         this.number=number;
@@ -29,7 +29,12 @@ public class ThreadTest extends Thread {
      */
     @Override
     public void run() {
-
+        System.out.println(Thread.currentThread().getName() + "--" + this.number);
+        try {
+            Thread.sleep(1000L); //处理业务逻辑
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     public static void main(String[] args) {
