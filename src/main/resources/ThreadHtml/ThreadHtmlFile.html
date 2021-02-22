@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>线程池相关问题</title>
+</head>
+<body>
+<h1>线程池相关问题</h1>
+<p>直接使用线程的run方法和start方法的区别 ，在断点方法中点击idea 的照相机的图标按钮，可以查看线程信息</p>
+<img src="../img/直接运行run方法.jpg" alt="" style="height: 200px;width: 600px">
+<p>start方法启动</p>
+<img src="../img/start方法启动.jpg" alt="" style="height: 200px;width: 600px">
+<hr>
+
+<p>线程池的操作效率大于普通线程操作速度，经过代码验证</p>
+<p>常见的3种线程池创建方式 ExecutorService cachedThreadPool = Executors.newCachedThreadPool(); // 运行速度最快
+    ExecutorService fixedThreadPool = Executors.newFixedThreadPool(10); // 较慢
+    ExecutorService executorService = Executors.newSingleThreadExecutor();// 慢
+ 三种创建方式的构造参数都是类似，但是效率却不同的原因如下</p>
+<hr>
+<p> ExecutorService cachedThreadPool = Executors.newCachedThreadPool(); // 运行速度最快 其原理同下图
+    第二个参数Integer.MAX_VALUE 是一个非常大的数字 2147483647 即在这个数字内的线程数，都会快速的处理</p>
+<img src="../img/处理效率最快的线程池.jpg" alt="" style="height: 400px;width: 1000px">
+<hr>
+<p>线程的复用</p>
+<img src="../img/线程的复用.jpg" alt="" style="height: 300px;width: 600px">
+<hr>
+<p>  ExecutorService fixedThreadPool = Executors.newFixedThreadPool(10);
+    // 较慢,如图，线程的执行效率和任务处理数在某种意义上成正比，当前的设置是10个线程，处理100个任务，
+    当初始化线程和执行任务数成正比，且值不大的时候，执行效率很快 </p>
+<img src="../img/稍微效率不太高的线程池.jpg" alt="" style="height: 400px;width: 800px">
+<p>  ExecutorService executorService = Executors.newSingleThreadExecutor();// 慢
+    // 最慢，相当于是单机版的newFixedThreadPool ，因为他不能自定义参数，只有一个线程 </p>
+<img src="../img/最慢的线程池.jpg" alt="" style="height: 400px;width: 800px">
+<hr>
+<p>但是以上创建线程的3种方式阿里并不推荐，
+    ExecutorService fixedThreadPool = Executors.newFixedThreadPool(10); // 较慢
+    ExecutorService executorService = Executors.newSingleThreadExecutor();// 慢
+    因为 LinkedBlockingQueue 队列，是可以无限存放，
+    暂时没有人执行的任务全部都会存放在队列里面，假如现在有1000W任务，但是初始线程数量只有10个，
+    那么剩余的900多W的线程都会放入LinkedBlockingQueue队列，那么服务器的内存就会受不了。
+    ExecutorService cachedThreadPool = Executors.newCachedThreadPool();
+    创建方式也不被推荐的方式就是，如果现在有1000W个任务要执行，那么就会创建1000W个线程，那么cpu就会100%，严重还会崩溃
+    </p>
+</body>
+</html>
