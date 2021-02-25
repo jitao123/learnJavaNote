@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<body>
+<h1>数据库的主从读写分离</h1>
+<pre>主从数据库读写分离的实现原理，从数据库配置了主数据库的ip地址+端口，开启了文件io读取和sql读取</pre>
+<img src="../img/mysql主从数据库的实现原理.jpg" alt="" style="height: 400px;width: 800px">
+<pre>实现流程</pre>
+<img src="../img/mysql主从数据库实现流程.jpg" alt="" style="height: 300px;width: 800px">
+<p>在主从复制的过程中容易出现的问题，当并发量太大，且从数据库的IO或者sql读取(写入)功能遇到阻塞，从数据库就会查询失败，
+    这时候有一个办法就是强制路由 /*master*/+sql 那么读取的话就是强制指定的主数据库 调优 </p>
+</body>
+</html>
