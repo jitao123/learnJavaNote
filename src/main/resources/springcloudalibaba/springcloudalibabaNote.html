@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>springcloudalibaba相关笔记</title>
+</head>
+<body>
+<h1>springcloudalibaba相关笔记</h1>
+<p>nacos实现原理，在服务器中下载，解压nacos ，使用命令启动，
+    在项目中引入 nacos 坐标jar包，在配置文件中按照约定进行配置，编写当前项目的
+    微服务名称，指定好端口号，启动成功后就能顺利被注册到nacos中</p>
+<pre>nacos依赖坐标
+        <dependency>
+        <groupId>com.alibaba.cloud</groupId>
+        <artifactId>spring‐cloud‐alibaba‐nacos‐discovery</artifactId>
+        </dependency>
+</pre>
+<p>多台微服务进行集群的时候 使用resTemlate，
+    进行远程调用的时候，直接使用http:+域名（发布的微服务项目的服务名称）+url（需要进行的远程调用）
+    但是前提是 ， 在引入的多台（被调用的服务的时候，需要在引入的restTemplate上面添加一个注解）</p>
+<hr>
+<pre>
+    //在主动发起调用的服务方的启动类中加入@LoadBalanced 注解就能实现负载均衡（Ribbon） ，就能实现一个随机调用多台同名服务器中的1个，
+    // 其中的默认方式是轮询 ，Ribbon其实现的基本原理是拦截url ，
+    //将需要访问的服务器的域名在nacos中读取，然后使用一定的算法获取其中的一台服务器进行调用
+    @Bean
+    @LoadBalanced
+    // 添加注解实现自定义的负载均衡
+    public RestTemplate restTemplate(){
+        return new RestTemplate();
+    }
+</pre>
+<hr>
+<pre>
+    1，本地仿远程调用 引入坐标
+    <groupId>org.springframework.cloud</groupId>
+    <artifactId>spring-cloud-starter-openfeign</artifactId>
+    2， 在主动调用方启动类上添加注解  @EnableFeignClients
+    3，自己本地定义一个接口类
+    // 作用，指定nacos下的具体微服务名称
+    @FeignClient("service-product")
+    public interface IProductService {
+
+    /**
+     * resultFul 风格定制接口
+     * @param pid
+     * @return
+     */
+    @RequestMapping("/product/{pid}")
+    Product getProductByPid(@PathVariable Integer pid);
+
+    4，在controller或者其他serviceImpl中使用
+    //像本地方法一样调用远程服务
+    @Autowired
+    private IProductService productService;
+
+    5，直接productService.getProductByPid(id) 就会调用到第三方的接口了
+</pre>
+<hr>
+<pre>FeignClient的实现原理 ，其本质是一个生成一个代理，将服务名称和方法上的url路径进行拼接，
+    底层还调用了 Ribbon，因为他要去解析被调用 的服务域名 </pre>
+<hr>
+<h3>sentinel</h3>
+<pre>
+    1,引入sentinel 的坐标
+    2，在配置文件中加入 sentinel 对feign 的支持
+    feign:
+        sentinel:
+            enabled: true
+    3，在配置文件中加入对 sentinel的支持
+       sentinel:
+        transport:
+         port: 9999 #跟控制台 交流的端口随意指定 一个未使用的端口即可
+         dashboard: localhost:8080  #指定控制台服务的地址
+    4，此时已经可以在项目中使用了，如果需要在网页中看见操作的话，需要在服务器中启动 sentinel的 客户端jar包
+    启动后直接访问IP:8080 登录默认的sentinel账号/密码
+</pre>
+
+<hr>
+<h3>seata</h3>
+<pre>
+    seata 分布式事物处理 ，引入坐标 ，在需要处理事物的方法上面加上注解
+    @GlobalTransactional // 分布式事物注解
+    实现原理
+    默认使用的是AT
+    整体机制
+    两阶段提交协议的演变:
+    ●一阶段:业务数据和回滚日志记录在同一个本地事务中提交，释放本地锁和连接资源。
+    ●二阶段:
+        。提交异步化,非常快速地完成。
+        。回滚通过一 阶段的回滚日志进行反向补偿。
+    seata 虽然效果很好，但是天猫和淘宝不会用这种架构，因为他实现是在底层加了很多锁，全局锁，
+    所以实现的效率就就没有那么高，不能做到高并发
+</pre>
+</body>
+</html>
