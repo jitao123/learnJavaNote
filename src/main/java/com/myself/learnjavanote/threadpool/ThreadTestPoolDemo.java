@@ -21,6 +21,12 @@ public class ThreadTestPoolDemo {
 //        ExecutorService executorService = Executors.newCachedThreadPool(); // 运行速度最快
 //        ExecutorService executorService = Executors.newFixedThreadPool(10); // 较慢
 //        ExecutorService executorService = Executors.newSingleThreadExecutor();// 慢
+        Executors.newScheduledThreadPool(20, new ThreadFactory() {
+            @Override
+            public Thread newThread(Runnable r) {
+                return new Thread(r);
+            }
+        });
 
         // 自定义线程池 ，初始核心员工容量为10，非核心员工10，自定义队列长度为10
         ThreadPoolExecutor executorService = new ThreadPoolExecutor(10,

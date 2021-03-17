@@ -99,6 +99,31 @@
     sys_task.MYI 存放的是索引相关信息
     <img src="../img/数据库sql执行的原理.jpg" alt="" style="height: 300px;width: 600px">
 </pre>
+        <hr>
+<pre>
+    InnoDB
+    InnoDB的引擎 数据的文件结构是
+    .frm 和 .ibd 文件  frm文件是表结构文件， .ibd文件是数据和索引都存在 这个文件
+    <img src="../img/innoDB引擎的区别.jpg" alt="" style="height: 300px;width: 600px">
+    innoDB 和MyISAM 的区别是 MyISAM 的叶子节点存储的是索引的数据在磁盘存储的文件地址
+    innoDB 存放的是 索引所在行的其他字段 数据信息
+
+</pre>
+        <hr>
+
+<pre>
+    聚集索引和非聚集索引的区别 ，1，非聚集索引，就像MyISAM 引擎，他的索引和数据是分开存放的 ，
+    索引存在MYI文件里面，数据存在MYD文件里面。而InnoDB数据库则是 索引和数据存在.ibd文件里面的
+    查询效率 聚集索引高，因为减少io读取文件操作
+</pre>
+        <hr>
+<pre>
+    为什么建议InnoDB表必须建主键,并且推荐使用整型的自增主键?
+    1，必须用B+tree 来组建表数据，如果设置来主键，mysql就会以主键为基础建立b+树
+    2，如果没有设置主键，那么mysql会在表中寻找一列没有重复值的列，维护到B+树里面，
+    如果实在没有一列没有重复数据的列，mysql后台会自动帮你建立一列隐藏数据，比如 RowId 列,
+    且用这一列不重复的数据进行维护成B+树
+</pre>
 </body>
 
 </html>
