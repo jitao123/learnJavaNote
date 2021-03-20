@@ -41,6 +41,7 @@ public class ThreadTest implements Runnable {
 //        new Thread(new ThreadTest()).run();
 //        new Thread(new ThreadTest()).start();
         int maxValue = Integer.MAX_VALUE;
+
         System.out.println(maxValue);
 
         Thread.sleep(1000L);
